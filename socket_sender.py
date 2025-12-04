@@ -37,11 +37,14 @@ class SocketSender:
         
         # Setup logging
         log_level = logging.DEBUG if verbose else logging.INFO
-        logging.basicConfig(
-            level=log_level,
-            format='%(asctime)s - %(levelname)s - %(message)s'
-        )
         self.logger = logging.getLogger(__name__)
+        
+        # Only configure logging if not already configured
+        if not self.logger.handlers:
+            handler = logging.StreamHandler()
+            handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+            self.logger.addHandler(handler)
+            self.logger.setLevel(log_level)
         
     def send_tcp(self, message: str) -> bool:
         """

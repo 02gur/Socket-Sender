@@ -21,12 +21,15 @@ class TestSocketSender(unittest.TestCase):
         
     def start_tcp_server(self, port):
         """Start a simple TCP echo server for testing."""
+        server_ready = threading.Event()
+        
         def run_server():
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 s.bind((self.test_host, port))
                 s.listen(1)
                 s.settimeout(5)
+                server_ready.set()  # Signal that server is ready
                 try:
                     conn, addr = s.accept()
                     with conn:
@@ -39,15 +42,18 @@ class TestSocketSender(unittest.TestCase):
         thread = threading.Thread(target=run_server)
         thread.daemon = True
         thread.start()
-        time.sleep(0.1)  # Give server time to start
+        server_ready.wait(timeout=2)  # Wait for server to be ready
         return thread
     
     def start_udp_server(self, port):
         """Start a simple UDP echo server for testing."""
+        server_ready = threading.Event()
+        
         def run_server():
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
                 s.bind((self.test_host, port))
                 s.settimeout(5)
+                server_ready.set()  # Signal that server is ready
                 try:
                     data, addr = s.recvfrom(4096)
                     if data:
@@ -58,7 +64,7 @@ class TestSocketSender(unittest.TestCase):
         thread = threading.Thread(target=run_server)
         thread.daemon = True
         thread.start()
-        time.sleep(0.1)  # Give server time to start
+        server_ready.wait(timeout=2)  # Wait for server to be ready
         return thread
     
     def test_tcp_send_success(self):
