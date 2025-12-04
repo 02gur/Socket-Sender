@@ -1,0 +1,3 @@
+Hello from Socket Sender!
+This is a test message that can be sent to a network socket.
+You can use this file with the -f/--file option.
