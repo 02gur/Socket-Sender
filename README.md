@@ -35,6 +35,8 @@ go build -o socketSender
 
 # Veya doğrudan çalıştırın
 go run main.go
+
+go run main.go -p 8899
 ```
 
 ### Cross-Platform Build
