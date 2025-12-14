@@ -1194,7 +1194,7 @@ func getWebInterface() string {
         .message-item.received {
             align-self: flex-start;
             background: transparent;
-            color: var(--text-primary);
+            color: #0fef37;
             border-left: 3px solid var(--success);
             border-bottom-left-radius: 12px;
         }
