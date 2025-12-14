@@ -1187,7 +1187,7 @@ func getWebInterface() string {
         .message-item.sent {
             align-self: flex-start;
             background: rgba(99, 102, 241, 0.1); /* Light indigo bg for sent */
-            color: var(--text-primary);
+            color: #3f71e7;
             border-left: 3px solid var(--accent-primary);
             border-bottom-right-radius: 12px;
         }
