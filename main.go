@@ -23,6 +23,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -1640,7 +1641,7 @@ func getWebInterface() string {
 </html>`
 }
 
-func setupWebServer(client *SocketClient) {
+func setupWebServer(client *SocketClient, port string) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		fmt.Fprint(w, getWebInterface())
@@ -1771,10 +1772,9 @@ func setupWebServer(client *SocketClient) {
 		json.NewEncoder(w).Encode(client.GetStatus())
 	})
 
-	fmt.Println("🌐 Web arayüzü: http://localhost:8080")
-	fmt.Println("🌐 02gur [github.com/02gur]")
 	go func() {
-		if err := http.ListenAndServe(":8080", nil); err != nil {
+		addr := ":" + port
+		if err := http.ListenAndServe(addr, nil); err != nil {
 			log.Printf("Web sunucu hatası: %v", err)
 		}
 	}()
@@ -1805,10 +1805,13 @@ func printHelp() {
 }
 
 func main() {
+	port := flag.String("p", "8080", "Web sunucusu portu")
+	flag.Parse()
+
 	client := NewSocketClient()
 
 	// Web sunucusunu başlat
-	setupWebServer(client)
+	setupWebServer(client, *port)
 
 	// Readline oluştur (komut geçmişi ve ok tuşları için)
 	rl, err := readline.NewEx(&readline.Config{
@@ -1828,7 +1831,7 @@ func main() {
 	fmt.Println("=== Socket Client ===")
 	fmt.Println("'help' yazarak komutları görebilirsiniz")
 	fmt.Println("Ok tuşları ile komut geçmişinde gezinebilirsiniz")
-	fmt.Println("🌐 Web arayüzü: http://localhost:8080")
+	fmt.Printf("🌐 Web arayüzü: http://localhost:%s\n", *port)
 	fmt.Println("🌐 02gur [github.com/02gur]")
 	fmt.Println()
 	printHelp()
