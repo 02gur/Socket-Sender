@@ -868,607 +868,770 @@ func getWebInterface() string {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Socket Client - Web Arayüzü</title>
+    <title>Socket Sender Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-dark: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-input: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --accent-primary: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-secondary: #0ea5e9;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --border: #e2e8f0;
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark); 
         }
-        .status {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-        .status.connected {
-            background: #4caf50;
-        }
-        .status.disconnected {
-            background: #f44336;
-        }
-        .content {
-            padding: 30px;
-        }
-        .section {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: #f5f5f5;
-            border-radius: 10px;
-        }
-        .section h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-            font-weight: 600;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-right: 10px;
-            margin-top: 10px;
-        }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        button:active {
-            transform: translateY(0);
-        }
-        button.danger {
-            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-        }
-        button.success {
-            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
-        }
-        .messages {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: 20px;
-            border-radius: 8px;
-            height: 400px;
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-        }
-        .message {
-            margin-bottom: 10px;
-            padding: 8px;
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-input); 
             border-radius: 4px;
         }
-        .message.sent {
-            background: rgba(76, 175, 80, 0.2);
-            border-left: 3px solid #4caf50;
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary); 
         }
-        .message.received {
-            background: rgba(33, 150, 243, 0.2);
-            border-left: 3px solid #2196f3;
-        }
-        .message.error {
-            background: rgba(244, 67, 54, 0.2);
-            border-left: 3px solid #f44336;
-        }
-        .message.info {
-            background: rgba(255, 193, 7, 0.2);
-            border-left: 3px solid #ffc107;
-        }
-        .headers-list {
+
+        /* Layout */
+        .app-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
+            height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            background: var(--bg-dark);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
-        .header-item {
-            background: white;
-            padding: 10px 15px;
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.5px;
+        }
+        .logo span {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
             border-radius: 8px;
-            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        .header-item strong {
-            color: #667eea;
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-primary);
         }
-        .header-item button {
-            padding: 5px 10px;
-            margin: 0;
-            font-size: 12px;
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.1), transparent);
+            color: var(--accent-primary);
+            border-left: 3px solid var(--accent-primary);
         }
-        .row {
+
+        .connection-status {
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            margin-top: auto;
+        }
+
+        .status-indicator {
             display: flex;
-            gap: 15px;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
         }
-        .row .form-group {
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            transition: background 0.3s;
+        }
+        .status-dot.connected { background: var(--success); box-shadow: 0 0 10px var(--success); }
+        .status-dot.disconnected { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+
+        .status-text {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Main Content */
+        .main-content {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
         }
+
+        .tab-content {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+        }
+        .tab-content.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
+            from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .messages {
-            scroll-behavior: smooth;
+
+        /* Header Bar */
+        .top-bar {
+            height: 60px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
         }
-        .message {
-            word-wrap: break-word;
-            white-space: pre-wrap;
+
+        .page-title {
+            font-size: 1.1rem;
+            font-weight: 600;
         }
+
+        .proxy-badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            display: none;
+            align-items: center;
+            gap: 5px;
+        }
+        .proxy-badge.active { display: flex; }
+        .proxy-badge.active span { color: var(--success); }
+
+        /* Forms & Inputs */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid transparent;
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        textarea {
+            font-family: 'JetBrains Mono', monospace;
+            resize: vertical;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        button {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary { background: var(--bg-input); color: var(--text-primary); }
+        button.secondary:hover { background: #475569; }
+
+        button.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        button.danger:hover { background: rgba(239, 68, 68, 0.2); }
+
+        /* Connection Bar (in Message Tab) */
+        .connection-bar {
+            padding: 20px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 30px;
+        }
+        .url-input-container {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Message Area */
+        .message-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #0b1120;
+        }
+
+        .message-item {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            position: relative;
+            word-break: break-all;
+            animation: slideIn 0.2s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-item.sent {
+            align-self: flex-start;
+            background: rgba(99, 102, 241, 0.1); /* Light indigo bg for sent */
+            color: var(--text-primary);
+            border-left: 3px solid var(--accent-primary);
+            border-bottom-right-radius: 12px;
+        }
+
+        .message-item.received {
+            align-self: flex-start;
+            background: transparent;
+            color: var(--text-primary);
+            border-left: 3px solid var(--success);
+            border-bottom-left-radius: 12px;
+        }
+
+        .message-item.info {
+            align-self: flex-start;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-left: 3px solid var(--text-secondary);
+        }
+
+        .message-item.error {
+            align-self: flex-start;
+            background: rgba(239, 68, 68, 0.05);
+            color: var(--danger);
+            border: none;
+            border-left: 3px solid var(--danger);
+            text-align: left;
+        }
+
+        .message-meta {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .message-input-area {
+            padding: 20px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+        }
+
+        /* Proxy & Headers Pages */
+        .page-content {
+            padding: 30px;
+            max-width: 800px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .header-list {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-dark);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .header-key { color: var(--accent-secondary); font-weight: 500; }
+        .header-val { color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; }
+
+        .helper-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🔌 Socket Client</h1>
-            <div class="status disconnected" id="status">Bağlı Değil</div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <span>⚡</span> SocketPro
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-item active" onclick="switchTab('tab-messages')">
+                    <span>💬</span> Mesajlaşma
+                </div>
+                <div class="nav-item" onclick="switchTab('tab-proxy')">
+                    <span>🛡️</span> Proxy Ayarları
+                </div>
+                <div class="nav-item" onclick="switchTab('tab-headers')">
+                    <span>📑</span> Header Yönetimi
+                </div>
+            </div>
+
+            <div class="connection-status">
+                <div class="status-indicator">
+                    <div id="statusDot" class="status-dot disconnected"></div>
+                    <span id="statusText" style="font-weight: 600;">Bağlı Değil</span>
+                </div>
+                <div id="statusAddress" class="status-text">-</div>
+            </div>
         </div>
-        <div class="content">
-            <div class="section">
-                <h2>Mesaj Geçmişi</h2>
-                <div style="margin-bottom: 10px;">
-                    <button onclick="clearMessages()" style="font-size: 12px; padding: 6px 12px;">Mesaj Geçmişini Temizle</button>
-                    <button onclick="scrollToBottom()" style="font-size: 12px; padding: 6px 12px;">En Alta Kaydır</button>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            
+            <!-- Global Top Bar -->
+            <div class="top-bar">
+                <div class="page-title" id="pageTitle">Mesajlaşma</div>
+                <div class="proxy-badge" id="proxyBadge">
+                    <span>●</span> Proxy Aktif
                 </div>
-                <div class="messages" id="messages"></div>
             </div>
 
-            <div class="section">
-                <h2>Bağlantı</h2>
-                <div class="form-group">
-                    <label>Proxy (Opsiyonel - Charles için: http://localhost:8888)</label>
-                    <input type="text" id="proxyURL" placeholder="http://localhost:8888 veya socks5://127.0.0.1:1080">
-                </div>
-                <button onclick="setProxy()">Proxy Ayarla</button>
-                <button onclick="removeProxy()">Proxy Kaldır</button>
-                <div id="proxyStatus" style="margin-top: 10px; color: #666; font-size: 0.9em;"></div>
-                <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
-                <div class="form-group">
-                    <label>Socket Adresi</label>
-                    <input type="text" id="address" placeholder="wss://api.example.com/v2 veya localhost:8080">
-                </div>
-                <button class="success" onclick="connect()">Bağlan</button>
-                <button class="danger" onclick="disconnect()">Bağlantıyı Kes</button>
-            </div>
-
-            <div class="section">
-                <h2>Mesaj Gönder</h2>
-                <div class="form-group">
-                    <label>Mesaj (Her satır ayrı bir mesaj olarak gönderilir)</label>
-                    <textarea id="message" rows="8" placeholder="Göndermek istediğiniz mesajı yazın...&#10;Birden fazla mesaj için her satıra bir mesaj yazın:&#10;[1,\"test\"]&#10;[2,\"test2\"]&#10;[3,\"test3\"]"></textarea>
-                    <small style="color: #666; display: block; margin-top: 5px;">
-                        Birden fazla mesaj göndermek için her satıra bir mesaj yazın. Boş satırlar atlanır.
-                    </small>
-                </div>
-                <button onclick="sendMessage()">Gönder</button>
-            </div>
-
-            <div class="section">
-                <h2>Header Yönetimi</h2>
-                <div class="form-group">
-                    <label>Raw Header'lar (Alt Alta Yapıştırın)</label>
-                    <textarea id="rawHeaders" rows="8" placeholder="Origin: https://example.com&#10;Cookie: session=abc123...&#10;Authorization: Bearer token...&#10;Sec-WebSocket-Protocol: wamp.2.json"></textarea>
-                    <small style="color: #666; display: block; margin-top: 5px;">
-                        Header'ları "Key: Value" formatında alt alta yapıştırın<br>
-                        <strong>Not:</strong> Connection, Upgrade, Sec-WebSocket-Key, Sec-WebSocket-Version header'ları otomatik eklenir, eklemeyin!
-                    </small>
-                </div>
-                <button onclick="parseAndAddHeaders()">Header'ları Parse Et ve Ekle</button>
-                <button onclick="clearAllHeaders()">Tüm Header'ları Temizle</button>
-                <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
-                <div class="row">
-                    <div class="form-group">
-                        <label>Header Key</label>
-                        <input type="text" id="headerKey" placeholder="Örn: Origin, Authorization">
-                    </div>
-                    <div class="form-group">
-                        <label>Header Value</label>
-                        <input type="text" id="headerValue" placeholder="Örn: https://example.com">
+            <!-- Tab 1: Messages -->
+            <div id="tab-messages" class="tab-content active">
+                <div class="connection-bar">
+                    <div class="url-input-container">
+                        <input type="text" id="address" placeholder="ws://localhost:8080 veya wss://api.example.com" value="ws://localhost:8080">
+                        <button onclick="connect()" id="btnConnect">Bağlan</button>
+                        <button onclick="disconnect()" class="danger" id="btnDisconnect" style="display:none;">Kes</button>
                     </div>
                 </div>
-                <button onclick="addHeader()">Tek Header Ekle</button>
-                <div class="headers-list" id="headersList"></div>
+
+                <div class="message-history" id="messages">
+                    <div class="message-item info">Socket Sender Pro'ya Hoşgeldiniz</div>
+                </div>
+
+                <div class="message-input-area">
+                    <div class="input-group">
+                        <textarea id="message" rows="3" placeholder="Mesajınızı buraya yazın... (Shift+Enter ile alt satır, Enter ile gönder)"></textarea>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="helper-text">Çoklu mesaj için her satıra ayrı mesaj yazın.</span>
+                        <div>
+                            <button class="secondary" onclick="clearMessages()">Temizle</button>
+                            <button onclick="sendMessage()">Gönder 🚀</button>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Tab 2: Proxy -->
+            <div id="tab-proxy" class="tab-content">
+                <div class="page-content">
+                    <div class="card">
+                        <h2 style="margin-bottom: 20px;">Proxy Yapılandırması</h2>
+                        <div class="input-group">
+                            <label>Proxy URL</label>
+                            <input type="text" id="proxyURL" placeholder="http://127.0.0.1:8888 (HTTP) veya socks5://...">
+                            <p class="helper-text">Trafik izleme veya tünelleme için proxy sunucusu tanımlayın.</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="setProxy()">Ayarları Kaydet</button>
+                            <button class="danger" onclick="removeProxy()">Proxy'yi Devre Dışı Bırak</button>
+                        </div>
+                        <div id="proxyCurrentStatus" style="margin-top: 20px; padding: 15px; background: var(--bg-dark); border-radius: 8px;">
+                            Mevcut Durum: <strong>Devre Dışı</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Headers -->
+            <div id="tab-headers" class="tab-content">
+                <div class="page-content">
+                    <div class="card" style="margin-bottom: 30px;">
+                        <h2 style="margin-bottom: 20px;">Hızlı Ekle</h2>
+                        <div class="input-group">
+                            <label>Raw Headers</label>
+                            <textarea id="rawHeaders" rows="5" placeholder="Authorization: Bearer token...&#10;Origin: https://example.com"></textarea>
+                            <p class="helper-text">Header'ları "Key: Value" formatında alt alta yapıştırın.</p>
+                        </div>
+                        <button onclick="parseAndAddHeaders()">Toplu Ekle</button>
+                    </div>
+
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2>Aktif Header'lar</h2>
+                            <button class="secondary" onclick="clearAllHeaders()" style="font-size: 0.8rem; padding: 8px 16px;">Tümünü Temizle</button>
+                        </div>
+                        
+                        <div class="input-group" style="display: flex; gap: 10px;">
+                            <input type="text" id="headerKey" placeholder="Key (örn. Cookie)">
+                            <input type="text" id="headerValue" placeholder="Value">
+                            <button onclick="addHeader()" style="white-space: nowrap;">Ekle +</button>
+                        </div>
+
+                        <div class="header-list" id="headersList">
+                            <!-- Headers will be injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <script>
+        // --- UI Logic ---
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Update Nav
+            const navIndex = ['tab-messages', 'tab-proxy', 'tab-headers'].indexOf(tabId);
+            document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
+
+            // Update Title
+            const titles = ['Mesajlaşma', 'Proxy Ayarları', 'Header Yönetimi'];
+            document.getElementById('pageTitle').innerText = titles[navIndex];
+        }
+
+        // --- WebSocket Logic ---
         let ws = null;
-        let currentStatus = { connected: false };
+        let lastSentMessage = null;
 
         function connectWebSocket() {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            ws = new WebSocket(protocol + '//' + window.location.host + '/ws');
+            const wsUrl = protocol + '//' + window.location.host + '/ws';
+            
+            ws = new WebSocket(wsUrl);
 
             ws.onopen = () => {
-                addMessage('Web arayüzü bağlandı', 'info');
+                addLog('Sistem: Web arayüzü bağlandı', 'info');
                 ws.send(JSON.stringify({ action: 'getStatus' }));
             };
 
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                if (data.type === 'status') {
-                    updateStatus(data.status);
-                } else if (data.type === 'connected') {
-                    addMessage(data.message, 'info');
-                    if (data.status) updateStatus(data.status);
-                } else if (data.type === 'disconnected') {
-                    addMessage(data.message, 'info');
-                    if (data.status) updateStatus(data.status);
-                } else if (data.type === 'sent') {
-                    // Console'dan gönderilen mesajlar için backend'den gelen mesajı göster
-                    // Web arayüzünden gönderilen mesajlar zaten sendMessage()'da gösterildi
-                    // Duplicate önlemek için kontrol et
-                    if (lastSentMessage !== data.data) {
-                        addMessage('sender: ' + data.data, 'sent');
-                    }
-                    lastSentMessage = null; // Reset
-                } else if (data.type === 'received') {
-                    // Gelen mesajları her zaman göster
-                    addMessage('receiver: ' + data.data, 'received');
-                } else if (data.type === 'success') {
-                    addMessage(data.message, 'info');
-                    if (data.status) updateStatus(data.status);
-                } else if (data.type === 'error') {
-                    addMessage('Hata: ' + (data.error || data.message), 'error');
-                    if (data.status) updateStatus(data.status);
-                } else if (data.type === 'info') {
-                    addMessage(data.message, 'info');
-                    if (data.status) updateStatus(data.status);
-                }
-            };
-
-            ws.onerror = (error) => {
-                addMessage('WebSocket hatası', 'error');
+                handleMessage(data);
             };
 
             ws.onclose = () => {
-                addMessage('Web arayüzü bağlantısı kesildi', 'error');
-                setTimeout(connectWebSocket, 3000);
+                updateConnectionStatus({ connected: false });
+                setTimeout(connectWebSocket, 2000);
             };
         }
 
-        function updateStatus(status) {
-            currentStatus = status;
-            const statusEl = document.getElementById('status');
-            if (status.connected) {
-                statusEl.textContent = 'Bağlı: ' + status.address;
-                statusEl.className = 'status connected';
-            } else {
-                statusEl.textContent = 'Bağlı Değil';
-                statusEl.className = 'status disconnected';
+        function handleMessage(data) {
+            if (data.status) {
+                updateConnectionStatus(data.status);
             }
-            updateHeadersList(status.headers || {});
-            
-            // Proxy durumunu göster
-            const proxyStatus = document.getElementById('proxyStatus');
-            if (status.proxy && status.proxy !== '') {
-                proxyStatus.textContent = '🔗 Proxy: ' + status.proxy;
-                proxyStatus.style.color = '#4caf50';
-            } else {
-                proxyStatus.textContent = '🔗 Proxy: Kapalı';
-                proxyStatus.style.color = '#999';
+
+            switch (data.type) {
+                case 'received':
+                    addLog(data.data, 'received');
+                    break;
+                case 'sent':
+                    if (data.data !== lastSentMessage) {
+                        addLog(data.data, 'sent');
+                    }
+                    lastSentMessage = null;
+                    break;
+                case 'error':
+                    addLog(data.error || data.message, 'error');
+                    break;
+                case 'info':
+                case 'connected':
+                case 'disconnected':
+                case 'success':
+                    addLog(data.message, 'info');
+                    break;
             }
         }
 
+        // --- Socket Actions ---
         function connect() {
             const address = document.getElementById('address').value;
-            if (!address) {
-                addMessage('Lütfen bir adres girin', 'error');
-                return;
-            }
-            if (!ws || ws.readyState !== WebSocket.OPEN) {
-                addMessage('Web arayüzü bağlantısı yok, bekleniyor...', 'error');
-                return;
-            }
-            addMessage('Bağlanılıyor: ' + address, 'info');
+            if (!address) return alert('Adres giriniz');
             ws.send(JSON.stringify({ action: 'connect', address: address }));
         }
 
         function disconnect() {
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ action: 'disconnect' }));
+            ws.send(JSON.stringify({ action: 'disconnect' }));
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('message');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const lines = text.split('\n').filter(l => l.trim().length > 0);
+
+            if (lines.length === 1) {
+                lastSentMessage = lines[0];
+                ws.send(JSON.stringify({ action: 'send', data: lines[0] }));
+                addLog(lines[0], 'sent');
+            } else {
+                for (let line of lines) {
+                    lastSentMessage = line;
+                    ws.send(JSON.stringify({ action: 'send', data: line }));
+                    addLog(line, 'sent');
+                    await new Promise(r => setTimeout(r, 50));
+                }
             }
+            input.value = '';
         }
 
         function setProxy() {
-            const proxyURL = document.getElementById('proxyURL').value.trim();
-            if (!proxyURL) {
-                addMessage('Lütfen bir proxy URL girin', 'error');
-                return;
-            }
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ action: 'setProxy', proxyURL: proxyURL }));
-            } else {
-                addMessage('Web arayüzü bağlantısı yok', 'error');
-            }
+            const url = document.getElementById('proxyURL').value.trim();
+            ws.send(JSON.stringify({ action: 'setProxy', proxyURL: url }));
         }
 
         function removeProxy() {
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ action: 'setProxy', proxyURL: '' }));
-                document.getElementById('proxyURL').value = '';
-            } else {
-                addMessage('Web arayüzü bağlantısı yok', 'error');
-            }
+            ws.send(JSON.stringify({ action: 'setProxy', proxyURL: '' }));
+            document.getElementById('proxyURL').value = '';
         }
 
-        let lastSentMessage = null;
-        let isSendingMultiple = false;
-        
-        async function sendMessage() {
-            const messageText = document.getElementById('message').value;
-            if (!messageText || !messageText.trim()) {
-                addMessage('Lütfen bir mesaj girin', 'error');
-                return;
-            }
-            if (ws && ws.readyState !== WebSocket.OPEN) {
-                addMessage('Bağlantı yok', 'error');
-                return;
-            }
-            
-            // Her satırı ayrı bir mesaj olarak işle
-            const lines = messageText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-            
-            if (lines.length === 0) {
-                addMessage('Geçerli mesaj bulunamadı', 'error');
-                return;
-            }
-            
-            if (lines.length === 1) {
-                // Tek mesaj
-                const msg = lines[0];
-                addMessage('sender: ' + msg, 'sent');
-                lastSentMessage = msg;
-                ws.send(JSON.stringify({ action: 'send', data: msg }));
-                document.getElementById('message').value = '';
-            } else {
-                // Çoklu mesaj
-                isSendingMultiple = true;
-                addMessage('📤 ' + lines.length + ' mesaj sırasıyla gönderiliyor...', 'info');
-                
-                for (let i = 0; i < lines.length; i++) {
-                    const msg = lines[i];
-                    addMessage('📤 Mesaj ' + (i+1) + '/' + lines.length + ': sender: ' + msg, 'sent');
-                    lastSentMessage = msg;
-                    
-                    // Mesajı gönder
-                    ws.send(JSON.stringify({ action: 'send', data: msg }));
-                    
-                    // Mesajlar arasında kısa bir bekleme (sunucuya yük bindirmemek için)
-                    if (i < lines.length - 1) {
-                        await new Promise(resolve => setTimeout(resolve, 100));
-                    }
-                }
-                
-                document.getElementById('message').value = '';
-                isSendingMultiple = false;
-                addMessage('✓ ' + lines.length + ' mesaj gönderildi', 'info');
-            }
-            
-            // Mesaj alanına odaklan (hızlı mesaj göndermek için)
-            document.getElementById('message').focus();
-        }
-        
-        // Enter tuşu ile mesaj gönderme
-        document.addEventListener('DOMContentLoaded', function() {
-            const messageInput = document.getElementById('message');
-            if (messageInput) {
-                messageInput.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                    }
-                });
-            }
-        });
-
-        function parseAndAddHeaders() {
-            const rawText = document.getElementById('rawHeaders').value.trim();
-            if (!rawText) {
-                addMessage('Lütfen header\'ları girin', 'error');
-                return;
-            }
-            
-            if (!ws || ws.readyState !== WebSocket.OPEN) {
-                addMessage('Web arayüzü bağlantısı yok', 'error');
-                return;
-            }
-
-            // Otomatik eklenen header'lar (bunları eklememeli)
-            const autoHeaders = {
-                'connection': true,
-                'upgrade': true,
-                'sec-websocket-key': true,
-                'sec-websocket-version': true,
-                'sec-websocket-extensions': true
-            };
-
-            const lines = rawText.split('\n');
-            let added = 0;
-            let skipped = 0;
-            let autoSkipped = 0;
-
-            for (let line of lines) {
-                line = line.trim();
-                if (!line) continue;
-
-                // "Key: Value" formatını parse et
-                const colonIndex = line.indexOf(':');
-                if (colonIndex === -1) {
-                    skipped++;
-                    continue;
-                }
-
-                const key = line.substring(0, colonIndex).trim();
-                const value = line.substring(colonIndex + 1).trim();
-
-                if (!key || !value) {
-                    skipped++;
-                    continue;
-                }
-
-                // Otomatik eklenen header'ları kontrol et
-                const keyLower = key.toLowerCase();
-                if (autoHeaders[keyLower]) {
-                    autoSkipped++;
-                    addMessage('Uyarı: ' + key + ' header\'ı otomatik eklenir, atlandı', 'info');
-                    continue;
-                }
-
-                // Header'ı ekle
-                ws.send(JSON.stringify({ action: 'setHeader', key: key, value: value }));
-                added++;
-            }
-
-            if (added > 0) {
-                var msg = added + ' header eklendi';
-                if (skipped > 0) {
-                    msg += ' (' + skipped + ' geçersiz satır atlandı)';
-                }
-                if (autoSkipped > 0) {
-                    msg += ' (' + autoSkipped + ' otomatik header atlandı)';
-                }
-                addMessage(msg, 'info');
-                document.getElementById('rawHeaders').value = '';
-            } else {
-                addMessage('Geçerli header bulunamadı', 'error');
-            }
-        }
-
-        function clearAllHeaders() {
-            if (!ws || ws.readyState !== WebSocket.OPEN) {
-                addMessage('Web arayüzü bağlantısı yok', 'error');
-                return;
-            }
-            
-            if (confirm('Tüm header\'ları temizlemek istediğinize emin misiniz?')) {
-                ws.send(JSON.stringify({ action: 'clearHeaders' }));
-            }
-        }
-
+        // --- Headers ---
         function addHeader() {
             const key = document.getElementById('headerKey').value;
             const value = document.getElementById('headerValue').value;
-            if (!key || !value) {
-                addMessage('Lütfen key ve value girin', 'error');
-                return;
-            }
-            if (ws && ws.readyState === WebSocket.OPEN) {
+            if (key && value) {
                 ws.send(JSON.stringify({ action: 'setHeader', key: key, value: value }));
                 document.getElementById('headerKey').value = '';
                 document.getElementById('headerValue').value = '';
             }
         }
 
-        function removeHeader(key) {
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ action: 'removeHeader', key: key }));
+        function parseAndAddHeaders() {
+            const raw = document.getElementById('rawHeaders').value;
+            const lines = raw.split('\n');
+            let count = 0;
+            lines.forEach(line => {
+                const parts = line.split(':');
+                if (parts.length >= 2) {
+                    const key = parts[0].trim();
+                    const val = parts.slice(1).join(':').trim();
+                    if (key && val) {
+                        ws.send(JSON.stringify({ action: 'setHeader', key: key, value: val }));
+                        count++;
+                    }
+                }
+            });
+            if(count > 0) {
+                document.getElementById('rawHeaders').value = '';
+                // Toast notification here conceptually
             }
         }
 
-        function updateHeadersList(headers) {
+        function clearAllHeaders() {
+            if(confirm('Tüm headerları silmek istediğine emin misin?')) {
+                ws.send(JSON.stringify({ action: 'clearHeaders' }));
+            }
+        }
+
+        function removeHeader(key) {
+            ws.send(JSON.stringify({ action: 'removeHeader', key: key }));
+        }
+
+        // --- Helpers ---
+        function addLog(msg, type) {
+            const container = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = 'message-item ' + type;
+            
+            const meta = document.createElement('span');
+            meta.className = 'message-meta';
+            const now = new Date();
+            meta.innerText = type.toUpperCase() + ' • ' + now.toLocaleTimeString();
+
+            div.appendChild(meta);
+            div.appendChild(document.createTextNode(msg));
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearMessages() {
+            document.getElementById('messages').innerHTML = '';
+        }
+
+        function updateConnectionStatus(status) {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            const addr = document.getElementById('statusAddress');
+            const btnConnect = document.getElementById('btnConnect');
+            const btnDisconnect = document.getElementById('btnDisconnect');
+
+            if (status.connected) {
+                dot.className = 'status-dot connected';
+                text.innerText = 'BAĞLI';
+                addr.innerText = status.address || 'Bilinmiyor';
+                btnConnect.style.display = 'none';
+                btnDisconnect.style.display = 'inline-flex';
+            } else {
+                dot.className = 'status-dot disconnected';
+                text.innerText = 'BAĞLI DEĞİL';
+                addr.innerText = '-';
+                btnConnect.style.display = 'inline-flex';
+                btnDisconnect.style.display = 'none';
+            }
+
+            // Proxy UI
+            const proxyBadge = document.getElementById('proxyBadge');
+            const proxyStatusBox = document.getElementById('proxyCurrentStatus');
+            if (status.proxy && status.proxy !== "") {
+                proxyBadge.classList.add('active');
+                proxyStatusBox.innerHTML = 'Mevcut Durum: <strong style="color:var(--success)">' + status.proxy + '</strong>';
+                document.getElementById('proxyURL').value = status.proxy;
+            } else {
+                proxyBadge.classList.remove('active');
+                proxyStatusBox.innerHTML = 'Mevcut Durum: <strong>Devre Dışı</strong>';
+            }
+
+            // Headers UI
             const list = document.getElementById('headersList');
             list.innerHTML = '';
-            for (const [key, value] of Object.entries(headers)) {
-                const item = document.createElement('div');
-                item.className = 'header-item';
-                item.innerHTML = '<strong>' + key + ':</strong> ' + value + 
-                    ' <button class="danger" onclick="removeHeader(\'' + key + '\')">Kaldır</button>';
-                list.appendChild(item);
+            if (status.headers) {
+                Object.entries(status.headers).forEach(([k, v]) => {
+                    const row = document.createElement('div');
+                    row.className = 'header-row';
+                    row.innerHTML = 
+                        '<div>' +
+                            '<div class="header-key">' + k + '</div>' +
+                            '<div class="header-val">' + v + '</div>' +
+                        '</div>' +
+                        '<button class="danger" style="padding: 6px 12px; font-size: 0.75rem;" onclick="removeHeader(\'' + k + '\')">Sil</button>';
+                    list.appendChild(row);
+                });
             }
         }
 
-        function addMessage(text, type) {
-            const messages = document.getElementById('messages');
-            const message = document.createElement('div');
-            message.className = 'message ' + type;
-            const time = new Date().toLocaleTimeString();
-            message.textContent = '[' + time + '] ' + text;
-            messages.appendChild(message);
-            
-            // Otomatik scroll - her zaman en alta kaydır (smooth)
-            scrollToBottom();
-            
-            // Yeni mesaj geldiğinde görsel geri bildirim
-            message.style.animation = 'fadeIn 0.3s';
-        }
-        
-        function scrollToBottom() {
-            const messages = document.getElementById('messages');
-            messages.scrollTop = messages.scrollHeight;
-        }
-        
-        function clearMessages() {
-            if (confirm('Mesaj geçmişini temizlemek istediğinize emin misiniz?')) {
-                document.getElementById('messages').innerHTML = '';
+        // --- Init ---
+        // Enter to send
+        document.getElementById('message').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
             }
-        }
-        
-        // Mesaj alanına Enter tuşu ile mesaj gönderme
-        document.addEventListener('DOMContentLoaded', function() {
-            const messageInput = document.getElementById('message');
-            if (messageInput) {
-                messageInput.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                    }
-                });
-            }
-            
-            // Sayfa yüklendiğinde mesaj alanına odaklan
-            messageInput.focus();
         });
 
         connectWebSocket();
@@ -1634,7 +1797,7 @@ func printHelp() {
 	fmt.Println("  disconnect            - Bağlantıyı kapat")
 	fmt.Println("  status                - Bağlantı durumunu göster")
 	fmt.Println("  proxy <url>           - Proxy ayarla (örn: proxy http://localhost:8888)")
-	fmt.Println("                        - Charles için: proxy http://localhost:8888")
+	fmt.Println("                        - HTTP için: proxy http://localhost:8888")
 	fmt.Println("  proxy-off             - Proxy'yi kapat")
 	fmt.Println("  help                  - Bu yardım mesajını göster")
 	fmt.Println("  exit                  - Programdan çık")
